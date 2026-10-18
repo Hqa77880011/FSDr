@@ -73,3 +73,15 @@ The truth file must contain measured or simulated oracle estimates, not observat
 Fitting writes one checkpoint per target policy and learner fold. `report.json` contains gate status, released DR values/intervals, IPS/SNIPS/DM diagnostics, clipping sensitivity, minimum propensity, minimum ESS ratio, immediate correctness AUC, long-gap AUC, and paired value-difference intervals. `--long-gap` defaults to 24 hours; no prior practice is treated as an unbounded gap. A single-class AUC stratum is `null`. `support.png` visualizes the ESS diagnostic and release threshold.
 
 The behavioral model and Q model are compact attention networks, not an imported AKT implementation. State construction, concept-conditioned decay, finite-horizon Bellman targets, learner separation and the selective release rule are explicit in the source. Gate thresholds remain fixed before target-policy values are examined.
+
+## Fixed reproduction setting
+
+Chronological learner logs; horizon/history20, five learner folds, width48, 30 epochs seed42, support-gated normalized DR and learner bootstrap1000.
+
+The checked-in entry point fixes data seeds, methods, budgets and output paths. Inspect its commands without starting any computation:
+
+```bash
+python reproduce.py --plan --csv data/csv
+```
+
+Remove `--plan` to execute the registered pipeline in a fresh output directory. The entry point calls the existing implementation; it does not insert paper results. Installation uses the package instructions above.
