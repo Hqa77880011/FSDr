@@ -1,4 +1,4 @@
-"""Chronological learner logs; horizon/history20, five learner folds, width48, 30 epochs seed42, support-gated normalized DR and learner bootstrap1000."""
+"""Finite learner practice logs; private ability excluded from observable history and learner-disjoint folds."""
 
 import argparse
 import json
@@ -16,8 +16,12 @@ def absolute_path(value):
 
 def build_steps(args):
     output = (ROOT / args.output).resolve()
-    return [
-        ["-m", "fsdr", "prepare", "--csv", args.csv, "--output", str(output / "data"), "--horizon", "20", "--history", "20", "--time-unit-seconds", "3600", "--seed", "42"],
+    source = args.csv or str(output / 'learners.csv')
+    steps = []
+    if not args.csv:
+        steps.append(['finite_data.py', '--output', str(output / 'learners.csv'), '--learners', '60', '--seed', '42'])
+    return steps + [
+        ["-m", "fsdr", "prepare", "--csv", source, "--output", str(output / "data"), "--horizon", "20", "--history", "20", "--time-unit-seconds", "3600", "--seed", "42"],
         ["-m", "fsdr", "fit", "--data", str(output / "data"), "--output", str(output / "models"), "--folds", "5", "--epochs", "30", "--width", "48", "--seed", "42"],
         ["-m", "fsdr", "evaluate", "--data", str(output / "data"), "--models", str(output / "models"), "--output", str(output / "evaluation"), "--folds", "5", "--bootstrap", "1000", "--seed", "42"],
     ]
@@ -25,9 +29,9 @@ def build_steps(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", default='outputs/fixed-setting')
+    parser.add_argument("--output", default='outputs/finite-setting')
     parser.add_argument("--plan", action="store_true", help="Print commands without creating data, fitting, inference or evaluation")
-    parser.add_argument('--csv', required=True, type=absolute_path)
+    parser.add_argument('--csv', type=absolute_path, help='Optional prepared input; otherwise generate the finite setting')
     args = parser.parse_args()
     output = (ROOT / args.output).resolve()
     if not args.plan and output.exists():

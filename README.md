@@ -76,12 +76,11 @@ The behavioral model and Q model are compact attention networks, not an imported
 
 ## Fixed reproduction setting
 
-Chronological learner logs; horizon/history20, five learner folds, width48, 30 epochs seed42, support-gated normalized DR and learner bootstrap1000.
-
-The checked-in entry point fixes data seeds, methods, budgets and output paths. Inspect its commands without starting any computation:
+The fixed source is 60 independent finite learners practicing six exercises across three concepts, with private evolving ability, concept-specific forgetting, variable gaps (including gaps above 24 hours), and stochastic correctness. The behavior policy chooses from past observed success/attempt counts. Its observation CSV contains only learner/exercise/concept/correct/timestamp, never private ability or response probabilities.
 
 ```bash
-python reproduce.py --plan --csv data/csv
+python reproduce.py --plan
+python reproduce.py --output outputs/finite-setting
 ```
 
-Remove `--plan` to execute the registered pipeline in a fresh output directory. The entry point calls the existing implementation; it does not insert paper results. Installation uses the package instructions above.
+The entry point generates logs using `finite_data.py --output outputs/finite-setting/learners.csv --learners 60 --seed 42`, then calls the existing learner-disjoint prepare/fit/evaluate pipeline (history/horizon 20, five folds, width 48, 30 epochs, seed 42, 1000 learner bootstrap draws). Gate failures retain diagnostic estimates and release null values as specified; no oracle policy values or bias/coverage results are invented from observational logs. Optional `--csv learners.csv` accepts other chronological logs.
